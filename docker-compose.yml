@@ -1,0 +1,36 @@
+services:
+
+  waf:
+    image: owasp/modsecurity-crs:nginx
+    container_name: waf-nginx
+    ports:
+      - "8080:8080"
+    environment:
+      BACKEND: http://dvwa:80
+      DETECTION_PARANOIA: 2
+      BLOCKING_PARANOIA: 2
+      ANOMALY_INBOUND: 5
+      ANOMALY_OUTBOUND: 4
+
+    volumes:
+      - ./nginx/default.conf.template:/etc/nginx/templates/conf.d/default.conf.template:ro
+    networks:
+      - waf-network
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -sS -o /dev/null --max-time 3 http://127.0.0.1:8080/ || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+  dvwa:
+    image: vulnerables/web-dvwa
+    container_name: dvwa
+    networks:
+      - waf-network
+    restart: unless-stopped
+networks:
+  waf-network:
+    external: true

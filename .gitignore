@@ -1,0 +1,15 @@
+# Generated reports and logs
+reports/*
+logs/*
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Local and temporary files
+*.log
+*.tmp
+*.swp
+.DS_Store
+__pycache__/
